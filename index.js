@@ -17,75 +17,53 @@ function narrowArtGalleryRecursive(gallery, column, roomsToClose, previouslyClos
         }
     }
 
+    const solutions = [];
+
     // Close top room
-    let solution1;
-    if (roomsToClose == 0) {
-        solution1 = narrowArtGalleryRecursive(gallery, column - 1, roomsToClose - 1, "top");
-        solution1.solution[0][column] = true;
-        solution1.solution[1][column] = false;
+    const solution1 = narrowArtGalleryRecursive(gallery, column - 1, roomsToClose - 1, "top");
+    solution1.solution[0][column] = true;
+    solution1.solution[1][column] = false;
+    if (previouslyClosed == "bottom" || roomsToClose == 0) {
         solution1.cost = -Infinity;
-    } else if (previouslyClosed == "bottom") {
-        solution1 = { cost: -Infinity, solution: undefined };
     } else {
-        solution1 = narrowArtGalleryRecursive(gallery, column - 1, roomsToClose - 1, "top");
-        solution1.solution[0][column] = true;
-        solution1.solution[1][column] = false;
         solution1.cost += gallery[0][column];
     }
 
     // Close bottom room
-    let solution2;
-    if (roomsToClose == 0) {
-        solution2 = narrowArtGalleryRecursive(gallery, column - 1, roomsToClose - 1, "bottom");
-        solution2.solution[0][column] = false;
-        solution2.solution[1][column] = true;
+    const solution2 = narrowArtGalleryRecursive(gallery, column - 1, roomsToClose - 1, "bottom");
+    solution2.solution[0][column] = false;
+    solution2.solution[1][column] = true;
+    if (previouslyClosed == "top" || roomsToClose == 0) {
         solution2.cost = -Infinity;
-    } else if (previouslyClosed == "top") {
-        solution2 = { cost: -Infinity, solution: undefined };
     } else {
-        solution2 = narrowArtGalleryRecursive(gallery, column - 1, roomsToClose - 1, "bottom");
-        solution2.solution[0][column] = false;
-        solution2.solution[1][column] = true;
         solution2.cost += gallery[1][column];
     }
 
     // Close no rooms
-    let solution3;
-    solution3 = narrowArtGalleryRecursive(gallery, column - 1, roomsToClose, "none");
+    const solution3 = narrowArtGalleryRecursive(gallery, column - 1, roomsToClose, "none");
     solution3.solution[0][column] = false;
     solution3.solution[1][column] = false;
-
-    console.group();
-    console.log(`Column ${column}, roomsToClose ${roomsToClose}, previous: ${previouslyClosed}`);
-    console.log(solution1);
-    console.log(solution2);
-    console.log(solution3);
 
     let solution;
     if (solution1.cost > solution2.cost) {
         if (solution1.cost > solution3.cost) {
-            console.log("choosing 1");
             solution = solution1;
         } else {
-            console.log("choosing 3");
             solution = solution3;
         }
     } else {
         if (solution2.cost > solution3.cost) {
-            console.log("choosing 2");
             solution = solution2;
         } else {
-            console.log("choosing 3");
             solution = solution3;
         }
     }
-    console.groupEnd();
     return solution;
 }
 
 function startNarrowArtGallery() {
-    table = document.getElementById("gallery");
-    gallery = Array.from(table.rows)
+    const table = document.getElementById("gallery");
+    const gallery = Array.from(table.rows)
         .map(
             row => Array.from(row.cells)
                 .map(
@@ -93,7 +71,9 @@ function startNarrowArtGallery() {
                 )
         );
 
-    solution = narrowArtGalleryRecursive(gallery, gallery[0].length - 1, 6, "none");
+    const roomsToClose = parseInt(document.getElementById("roomsToClose").value);
+
+    const solution = narrowArtGalleryRecursive(gallery, gallery[0].length - 1, roomsToClose, "none");
 
     console.log(solution);
 
