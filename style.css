@@ -1,0 +1,15 @@
+td {
+    width: 20px;
+    height: 20px;
+    background-color: grey;
+    text-align: center;
+    vertical-align: center;
+}
+
+td.open {
+    background-color: green;
+}
+
+td.close {
+    background-color: red;
+}
