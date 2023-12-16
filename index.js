@@ -1,26 +1,49 @@
-function maxAndIndex(arr) {
-    if (arr.length == 1) {
+function chooseBestOption(options) {
+    if (options.length == 1) {
         throw Error("Array is empty");
     }
-    if (arr.length == 1) {
+    if (options.length == 1) {
         return 0;
     }
-    let max = arr[0];
+    let max = options[0];
     let maxIndex = 0;
-    for (let i = 1; i < arr.length; i++) {
-        if (arr[i] > max) {
-            max = arr[i];
+    for (let i = 1; i < options.length; i++) {
+        if (options[i] > max) {
+            max = options[i];
             maxIndex = i;
         }
     }
 
-    return { value: max, index: maxIndex };
+    return { bestCost: max, bestOption: maxIndex };
 }
 
+/**
+ * Solves the narrow art gallery problem with dynamic programming.
+ *
+ * @param {Number[][]} gallery The array representing the art gallery.
+ * @param {Number} roomsToClose The number of rooms we have left to close.
+ *
+ * @returns {{ cost: Number, solution: Boolean[][] }}
+ * Solution the problem and its cost. In the solution array, if index (i, j) is
+ * true, it means close that room. If it is false, leave it open.
+ */
 function narrowArtGalleryDynamic(gallery, roomsToClose) {
     // We add 1 to the length of the gallery so that we can denote column 0 as 0
     // rooms left in the gallery.
     const n = gallery[0].length + 1;
+
+    // We define:
+    // 0 -> close no rooms
+    // 1 -> close top room
+    // 2 -> close bottom room
+    const NONE = 0;
+    const TOP = 1;
+    const BOTTOM = 2;
+
+    const OPTIONS = [NONE, TOP, BOTTOM];
+
+    // This is the cost of a solution if it is invalid
+    const INVALID_SOLUTION_COST = -Infinity;
 
     // n x r x 3 arrays to store cost and solution
 
@@ -33,136 +56,104 @@ function narrowArtGalleryDynamic(gallery, roomsToClose) {
     const cost = Array(n).fill(0).map(() => Array(roomsToClose+1).fill(0).map(() => Array(3).fill(0)));
     const advice = Array(n).fill(0).map(() => Array(roomsToClose+1).fill(0).map(() => Array(3).fill(0)));
 
-    // We define:
-    // 0 -> close no rooms
-    // 1 -> close top room
-    // 2 -> close bottom room
-
     // If we reach the end of the hall and have no rooms left to close (we
     // closed all the rooms we needed to), then the solution is valid and we
-    // start with a cost of 0. We close no rooms because we have no rooms left
-    // to close.
-    cost[0][0][0] = 0;
-    advice[0][0][0] = 0;
-    cost[0][0][1] = 0;
-    cost[0][0][2] = 0;
-    advice[0][0][1] = 0;
-    advice[0][0][2] = 0;
-    // We cannot close any rooms if there are none left to close, so these are
-    // invalid.
-    // cost[0][0][1] = -Infinity;
-    // cost[0][0][2] = -Infinity;
-    // advice[0][0][1] = null;
-    // advice[0][0][2] = null;
+    // start with a cost of 0.
+    cost[0][0][NONE] = 0;
+    cost[0][0][TOP] = 0;
+    cost[0][0][BOTTOM] = 0;
+    advice[0][0][NONE] = NONE;
+    advice[0][0][TOP] = NONE;
+    advice[0][0][BOTTOM] = NONE;
 
     // If we reach the end of the hall and still have rooms left to close, then
     // the solution is invalid.
     for (let i = 1; i < roomsToClose; i++) {
-        cost[0][i][0] = -Infinity;
-        cost[0][i][1] = -Infinity;
-        cost[0][i][2] = -Infinity;
-        advice[0][i][0] = null;
-        advice[0][i][1] = null;
-        advice[0][i][2] = null;
+        cost[0][i][NONE] = INVALID_SOLUTION_COST;
+        cost[0][i][TOP] = INVALID_SOLUTION_COST;
+        cost[0][i][BOTTOM] = INVALID_SOLUTION_COST;
+        advice[0][i][NONE] = null;
+        advice[0][i][TOP] = null;
+        advice[0][i][BOTTOM] = null;
     }
 
     // Solve each subinstance
     for (let column = 1; column < n; column++) {
         for (let r = 1; r <= roomsToClose; r++) {
-            for (let close = 0; close < 3; close++) {
-                let topCost;
-                if (close == 2 || r == 0) {
-                    topCost = -Infinity;
-                } else {
-                    topCost = cost[column-1][r-1][1] + gallery[0][column-1];
+            for (const close of OPTIONS) {
+                // The three options we can take:
+                //   0 -> close no rooms
+                //   1 -> close the  top room
+                //   2 -> close the bottom room
+                // All three options start as invalid until we decide otherwise
+                const options = [
+                    INVALID_SOLUTION_COST,
+                    INVALID_SOLUTION_COST,
+                    INVALID_SOLUTION_COST
+                ];
+
+                // Don't close any rooms - no change in cost
+                options[NONE] = cost[column-1][r][NONE];
+
+                // If we did not close the bottom room last and we still have
+                // rooms to close, then we can close the top room
+                if (close != BOTTOM && r > 0) {
+                    options[TOP] = cost[column-1][r-1][TOP] + gallery[0][column-1];
                 }
 
-                let botCost;
-                if (close == 1 || r == 0) {
-                    botCost = -Infinity;
-                } else {
-                    botCost = cost[column-1][r-1][2] + gallery[1][column-1];
+                // If we did not close the top room last and we still have rooms
+                // to close, then we can close the bottom room
+                if (close != TOP && r > 0) {
+                    options[BOTTOM]= cost[column-1][r-1][BOTTOM] + gallery[1][column-1];
                 }
 
-                let noneCost = cost[column-1][r][0];
+                const { bestOption, bestCost } = chooseBestOption(options);
 
-                let bestCost;
-                let bestAdvice;
-                if (topCost > botCost) {
-                    if (topCost > noneCost) {
-                        bestCost = topCost;
-                        bestAdvice = 1;
-                    } else {
-                        bestCost = noneCost;
-                        bestAdvice = 0;
-                    }
-                } else {
-                    if (botCost > noneCost) {
-                        bestCost = botCost;
-                        bestAdvice = 2;
-                    } else {
-                        bestCost = noneCost;
-                        bestAdvice = 0;
-                    }
-                }
-                console.group();
-                console.log(`col: ${column}, Gallery top: ${gallery[0][column]}, Gallery bot: ${gallery[1][column]}`);
-                console.log(`Column: ${column}, r: ${r}, lastClosed: ${close}`);
-                console.log(`Top: ${topCost}, Bot: ${botCost}, None: ${noneCost}`);
-                console.log(`Best cost: ${bestCost}`);
-                console.log(`Best advice: ${bestAdvice}`);
-                console.groupEnd();
-                cost[column][r][close] = bestOptionCost;
+                // Advice tells us what door (if any) to close in this column
                 advice[column][r][close] = bestOption;
+                // And cost tells us what the cost of this decision is
+                cost[column][r][close] = bestCost;
             }
         }
     }
 
-    const c1 = cost[n-1][roomsToClose-1][1];
-    const c2 = cost[n-1][roomsToClose-1][2];
-    const c3 = cost[n-1][roomsToClose-1][0];
+    // At this point, the advice tells us which rooms to close throughout the
+    // gallery. We need to iterate through the advice to build the full
+    // solution.
 
-    let start;
-    if (c1 > c2) {
-        if (c1 > c3) {
-            start = 1;
-        } else {
-            start = 0;
-        }
-    } else {
-        if (c2 > c3) {
-            start = 2;
-        } else {
-            start = 0;
-        }
-    }
-
+    // True at index (i, j) means close room (i, j). False means keep it open.
     const solution = [Array(n-1).fill(false), Array(n-1).fill(false)];
-    console.log(advice);
+
+    // Decide how we should start the solution (which door (if any) to close in
+    // the first column)
+    const {
+        bestOption: start,
+        bestCost: bestSolutionCost
+    } = chooseBestOption(cost[n-1][roomsToClose-1]);
 
     let r = roomsToClose;
     let lastClosed = start;
-    console.log(`Starting at ${start}`);
-    console.group();
     for (let i = n-1; i > 0; i--) {
+        // Which room do we close at column `i` with `r` rooms left to close
+        // given that we just closed `lastClosed`?
         let closeRoom = advice[i][r][lastClosed];
-        console.log(`i: ${i}, r: ${r}, last: ${lastClosed}, DO THIS: ${closeRoom}`);
-        if (closeRoom == 1) {
+
+        if (closeRoom == TOP) {
             solution[0][i-1] = true;
             r--;
-        } else if (closeRoom == 2) {
+        } else if (closeRoom == BOTTOM) {
             solution[1][i-1] = true;
             r--;
         }
         lastClosed = closeRoom;
     }
-    console.groupEnd();
 
-    return solution;
+    return { cost: bestSolutionCost, solution: solution };
 }
 
 /**
- * Narrow art gallery problem.
+ * Solves the narrow art gallery problem with recursive backtracking (brute
+ * force).
  *
  * @param {Number[][]} gallery The array representing the art gallery.
  * @param {Number} column The column of the art gallery we are currently considering.
@@ -237,15 +228,10 @@ function startNarrowArtGallery() {
     const solutionRecursive = narrowArtGalleryRecursive(gallery, gallery[0].length - 1, roomsToClose, "none");
     const solutionDynamic = narrowArtGalleryDynamic(gallery, roomsToClose);
 
-    console.group();
-    console.log(solutionRecursive);
-    console.log(solutionDynamic);
-    console.groupEnd();
-
     document.getElementById("solution1").innerHTML = "";
     document.getElementById("solution2").innerHTML = "";
     buildSolutionTable(gallery, solutionRecursive.solution, 1);
-    buildSolutionTable(gallery, solutionDynamic, 2);
+    buildSolutionTable(gallery, solutionDynamic.solution, 2);
 }
 
 function buildSolutionTable(galleryInput, gallerySolution, i) {
