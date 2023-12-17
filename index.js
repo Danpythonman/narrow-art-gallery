@@ -23,9 +23,7 @@ function chooseBestOption(options) {
  * @param {Number[][]} gallery The array representing the art gallery.
  * @param {Number} roomsToClose The number of rooms we have left to close.
  *
- * @returns {{ cost: Number, solution: Boolean[][] }}
- * Solution the problem and its cost. In the solution array, if index (i, j) is
- * true, it means close that room. If it is false, leave it open.
+ * @returns {{ cost: Number, solution: Boolean[][] }} Solution the problem and its cost. In the solution array, if index (i, j) is true, it means close that room. If it is false, leave it open.
  */
 function narrowArtGalleryDynamic(gallery, roomsToClose) {
     // We add 1 to the length of the gallery so that we can denote column 0 as 0
@@ -213,43 +211,138 @@ function narrowArtGalleryRecursive(gallery, column, roomsToClose, previouslyClos
     return solution;
 }
 
-function startNarrowArtGallery() {
-    const table = document.getElementById("gallery");
-    const gallery = Array.from(table.rows)
+/**
+ * Gets the array representation of the input gallery where each entry of the
+ * array represents the value of a room.
+ *
+ * @returns {Number[][]} The input gallery.
+ */
+function getInputGallery() {
+    const table = document.getElementById("input-gallery");
+    return gallery = Array.from(table.rows)
         .map(
             row => Array.from(row.cells)
                 .map(
                     cell => parseInt(cell.innerText)
                 )
         );
+}
+
+/**
+ * Executes the narrow art gallery algorithms and displays their output tables.
+ */
+function startNarrowArtGallery() {
+    const gallery = getInputGallery();
 
     const roomsToClose = parseInt(document.getElementById("roomsToClose").value);
 
     const solutionRecursive = narrowArtGalleryRecursive(gallery, gallery[0].length - 1, roomsToClose, "none");
     const solutionDynamic = narrowArtGalleryDynamic(gallery, roomsToClose);
 
-    document.getElementById("solution1").innerHTML = "";
-    document.getElementById("solution2").innerHTML = "";
-    buildSolutionTable(gallery, solutionRecursive.solution, 1);
-    buildSolutionTable(gallery, solutionDynamic.solution, 2);
+    const recursiveBacktrackingSolutionDiv = document.getElementById("recursive-backtracking-solution");
+    buildGalleryTable(
+        gallery,
+        recursiveBacktrackingSolutionDiv,
+        "recursive-backtracking-solution-gallery",
+        solutionRecursive.solution
+    );
+
+    const dynamicProgrammingSolutionDiv = document.getElementById("dynamic-programming-solution");
+    buildGalleryTable(
+        gallery,
+        dynamicProgrammingSolutionDiv,
+        "dynamic-programming-solution-gallery",
+        solutionDynamic.solution
+    );
 }
 
-function buildSolutionTable(galleryInput, gallerySolution, i) {
-    const solutionDiv = i == 1 ? document.getElementById("solution1") : document.getElementById("solution2");
+/**
+ * Displays the solution table for the narrow art gallery problem.
+ *
+ * Note that the div that the table is being appended to is cleared before the
+ * table appended. So anything else in the div will be removed by this method.
+ *
+ * If the gallery solution is provided, rooms will be marked as closed and opened.
+ *
+ * @param {Number[][]} gallery The input gallery. Each entry represents the value of the room.
+ * @param {HTMLDivElement} galleryParentDiv The div element that the table will be appended to.
+ * @param {String} id The id to be given to the table element when it is created.
+ * @param {Boolean[][]} gallerySolution The solution gallery. If an entry is `true`, it will be marked as closed. Otherwise, it is open.
+ */
+function buildGalleryTable(gallery, galleryParentDiv, id, gallerySolution = null) {
     const table = document.createElement("table");
+    if (id != null) {
+        table.id = id;
+    }
+
+    table.classList.add("gallery");
+
     for (const i in [0, 1]) {
         const tr = table.insertRow();
-        for (let j = 0; j < galleryInput[i].length; j++) {
+        for (let j = 0; j < gallery[i].length; j++) {
             const td = tr.insertCell();
-            td.appendChild(document.createTextNode(galleryInput[i][j]));
-            if (gallerySolution[i][j]) {
-                td.classList.add("close");
-            } else {
-                td.classList.add("open")
+            td.appendChild(document.createTextNode(gallery[i][j]));
+
+            if (gallerySolution != null) {
+                if (gallerySolution[i][j]) {
+                    td.classList.add("close");
+                } else {
+                    td.classList.add("open")
+                }
             }
         }
     }
-    solutionDiv.appendChild(table);
+
+    galleryParentDiv.innerHTML = "";
+    galleryParentDiv.appendChild(table);
+}
+
+/**
+ * Updates the input gallery based on the number of columns.
+ *
+ * Reads the value from the number of columns input and:
+ * - if it is 0 or not a number, do nothing
+ * - if it is larger than the current gallery, append rooms to the current
+ *   gallery, all of which are valued at 0
+ * - if it is smaller than the current gallery, remove the extra rooms from the
+ *   current gallery.
+ */
+function updateInputGallery() {
+    const numberOfColumns = parseInt(document.getElementById("numberOfColumns").value);
+
+    if (isNaN(numberOfColumns) || numberOfColumns == 0) {
+        return;
+    }
+
+    const gallery = getInputGallery();
+
+    const newGallery = [Array(numberOfColumns), Array(numberOfColumns)];
+
+    for (const i of [0, 1]) {
+        for (let j = 0; j < numberOfColumns; j++) {
+            if (j < gallery[0].length) {
+                newGallery[i][j] = gallery[i][j];
+            } else {
+                newGallery[i][j] = 0;
+            }
+        }
+    }
+
+    const inputGalleryDiv = document.getElementById("input");
+    buildGalleryTable(newGallery, inputGalleryDiv, "input-gallery");
+}
+
+/**
+ * Randomizes the values of the input gallery. The value of each room in the
+ * gallery will be a random integer from 0 to 10 (inclusive).
+ */
+function randomizeGalleryRoomValues() {
+    const gallery = getInputGallery();
+    const newGallery = gallery.map(row => row.map(() => Math.floor(Math.random() * 10)));
+    const inputGalleryDiv = document.getElementById("input");
+    buildGalleryTable(newGallery, inputGalleryDiv, "input-gallery");
 }
 
 document.getElementById("startButton").addEventListener("click", startNarrowArtGallery);
+document.getElementById("numberOfColumns").addEventListener("input", updateInputGallery);
+document.getElementById("randomizeButton").addEventListener("click", randomizeGalleryRoomValues);

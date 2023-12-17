@@ -1,4 +1,4 @@
-td {
+.gallery td {
     width: 20px;
     height: 20px;
     background-color: grey;
@@ -6,10 +6,42 @@ td {
     vertical-align: center;
 }
 
-td.open {
+.gallery td.open {
     background-color: green;
 }
 
-td.close {
+.gallery td.close {
     background-color: red;
+}
+
+h1 {
+    font-family: 'Racing Sans One', sans-serif;
+    background-color: cornflowerblue;
+    color: white;
+    text-align: center;
+}
+
+p {
+    width: 60%;
+    margin: auto;
+    font-family: 'Oxygen', sans-serif;
+    font-size: 18px;
+}
+
+#controls {
+    margin-top: 50px;
+}
+
+#controls label {
+    font-family: 'Oxygen', sans-serif;
+    font-size: 18px;
+}
+
+#controls input {
+    width: 40px;
+    height: 20px;
+}
+
+#input .gallery {
+    margin: 50px auto 0;
 }

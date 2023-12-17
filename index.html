@@ -3,10 +3,29 @@
     <head>
         <title>Narrow Art Gallery</title>
         <link rel="stylesheet" href="style.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Oxygen:wght@300&family=Racing+Sans+One&display=swap" rel="stylesheet">
     </head>
     <body>
+        <h1>Narrow Art Gallery Problem</h1>
+        <p>
+            You are the curator for an art gallery.
+            The gallery has two rows of rooms and each room has a value.
+            Visitors can enter and exit rooms from the top, bottom, or side (not diagonally), which means that if two adjacent rooms in different rows are closed the visitors cannot pass through.
+            You have to close a certain number of rooms without blocking the visitors.
+            The goal is the maximize the cost of the closed rooms.
+        </p>
+        <div id="controls">
+            <label for="numberOfColumns">Sets of rooms</label>
+            <input id="numberOfColumns" type="number" size="3">
+            <label for="roomsToClose">Rooms to close</label>
+            <input id="roomsToClose" type="number">
+            <button id="randomizeButton">Randomize</button>
+            <button id="startButton">Go</button>
+        </div>
         <div id="input">
-            <table id="gallery">
+            <table class="gallery" id="input-gallery">
                 <tr>
                     <td>1</td>
                     <td>1</td>
@@ -29,14 +48,12 @@
                 </tr>
             </table>
         </div>
-        <div id="solution1">
+        <div id="recursive-backtracking-solution">
             <!-- Recursive backtracking solution goes here -->
         </div>
-        <div id="solution2">
+        <div id="dynamic-programming-solution">
             <!-- Dynamic programming solution goes here -->
         </div>
-        <input id="roomsToClose" type="text">
-        <button id="startButton">Go</button>
         <script src="index.js"></script>
     </body>
 </html>
