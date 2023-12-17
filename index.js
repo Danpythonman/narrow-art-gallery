@@ -223,7 +223,7 @@ function getInputGallery() {
         .map(
             row => Array.from(row.cells)
                 .map(
-                    cell => parseInt(cell.innerText)
+                    cell => parseInt(cell.querySelector("input").value)
                 )
         );
 }
@@ -262,7 +262,9 @@ function startNarrowArtGallery() {
  * Note that the div that the table is being appended to is cleared before the
  * table appended. So anything else in the div will be removed by this method.
  *
- * If the gallery solution is provided, rooms will be marked as closed and opened.
+ * If the gallery solution is provided, rooms will be marked as closed and
+ * opened. If the gallery solution is not provided, the table cells will be
+ * inputs instead of just text.
  *
  * @param {Number[][]} gallery The input gallery. Each entry represents the value of the room.
  * @param {HTMLDivElement} galleryParentDiv The div element that the table will be appended to.
@@ -276,14 +278,21 @@ function buildGalleryTable(gallery, galleryParentDiv, id, gallerySolution = null
     }
 
     table.classList.add("gallery");
+    if (gallerySolution == null) {
+        table.classList.add("input");
+    }
 
     for (const i in [0, 1]) {
         const tr = table.insertRow();
         for (let j = 0; j < gallery[i].length; j++) {
             const td = tr.insertCell();
-            td.appendChild(document.createTextNode(gallery[i][j]));
-
-            if (gallerySolution != null) {
+            if (gallerySolution == null) {
+                const input = document.createElement("input");
+                input.type = "number";
+                input.value = gallery[i][j];
+                td.appendChild(input);
+            } else {
+                td.appendChild(document.createTextNode(gallery[i][j]));
                 if (gallerySolution[i][j]) {
                     td.classList.add("close");
                 } else {

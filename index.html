@@ -5,7 +5,7 @@
         <link rel="stylesheet" href="style.css">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Oxygen:wght@300&family=Racing+Sans+One&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Racing+Sans+One&display=swap" rel="stylesheet">
     </head>
     <body>
         <h1>Narrow Art Gallery Problem</h1>
@@ -16,35 +16,67 @@
             You have to close a certain number of rooms without blocking the visitors.
             The goal is the maximize the cost of the closed rooms.
         </p>
-        <div id="controls">
-            <label for="numberOfColumns">Sets of rooms</label>
-            <input id="numberOfColumns" type="number" size="3">
-            <label for="roomsToClose">Rooms to close</label>
-            <input id="roomsToClose" type="number">
-            <button id="randomizeButton">Randomize</button>
-            <button id="startButton">Go</button>
+        <div id="control-stripe">
+            <div id="controls">
+                <div class="text-control">
+                    <div>
+                        <label for="numberOfColumns">Total Rooms</label>
+                        <input id="numberOfColumns" type="number" size="3">
+                    </div>
+                    <div>
+                        <label for="roomsToClose">Rooms to Close</label>
+                        <input id="roomsToClose" type="number">
+                    </div>
+                </div>
+                <div class="radio-control">
+                    <div>
+                        <input type="radio" name="algorithm" id="recursive">
+                        <label for="recursive">Brute Force</label>
+                    </div>
+                    <div>
+                        <input type="radio" name="algorithm" id="dynamic" checked>
+                        <label for="dynamic">Dynamic Programming</label>
+                    </div>
+                </div>
+                <div class="radio-control">
+                    <div>
+                        <input type="radio" name="goal" id="minimize">
+                        <label for="minimize">Minimize Cost</label>
+                    </div>
+                    <div>
+                        <input type="radio" name="goal" id="maximize" checked>
+                        <label for="maximize">Maximize Value</label>
+                    </div>
+                </div>
+                <div class="button-control">
+                    <button id="randomizeButton">Randomize</button>
+                </div>
+                <div class="button-control">
+                    <button id="startButton">Go</button>
+                </div>
+            </div>
         </div>
         <div id="input">
-            <table class="gallery" id="input-gallery">
+            <table class="input gallery" id="input-gallery">
                 <tr>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>2</td>
-                    <td>3</td>
-                    <td>5</td>
-                    <td>10</td>
-                    <td>10</td>
-                    <td>2</td>
+                    <td><input type="number" value="1"></td>
+                    <td><input type="number" value="1"></td>
+                    <td><input type="number" value="1"></td>
+                    <td><input type="number" value="1"></td>
+                    <td><input type="number" value="1"></td>
+                    <td><input type="number" value="1"></td>
+                    <td><input type="number" value="1"></td>
+                    <td><input type="number" value="1"></td>
                 </tr>
                 <tr>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>6</td>
-                    <td>6</td>
-                    <td>6</td>
-                    <td>6</td>
-                    <td>6</td>
-                    <td>6</td>
+                    <td><input type="number" value="1"></td>
+                    <td><input type="number" value="1"></td>
+                    <td><input type="number" value="1"></td>
+                    <td><input type="number" value="1"></td>
+                    <td><input type="number" value="1"></td>
+                    <td><input type="number" value="1"></td>
+                    <td><input type="number" value="1"></td>
+                    <td><input type="number" value="1"></td>
                 </tr>
             </table>
         </div>

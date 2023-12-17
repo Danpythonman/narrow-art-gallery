@@ -1,17 +1,40 @@
 .gallery td {
-    width: 20px;
-    height: 20px;
-    background-color: grey;
+    height: 50px;
+    width: 50px;
+    background-color: lightgray;
     text-align: center;
     vertical-align: center;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
 }
 
 .gallery td.open {
-    background-color: green;
+    background-color: lightgreen;
 }
 
 .gallery td.close {
-    background-color: red;
+    background-color: lightpink;
+}
+
+.input.gallery input {
+    height: 40px;
+    width: 40px;
+    margin: 0;
+    background-color: lightgray;
+    border: none;
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.input.gallery input::-webkit-outer-spin-button,
+.input.gallery input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.input.gallery input[type=number] {
+    -moz-appearance: textfield;
 }
 
 h1 {
@@ -24,22 +47,83 @@ h1 {
 p {
     width: 60%;
     margin: auto;
-    font-family: 'Oxygen', sans-serif;
+    text-align: justify;
+    text-justify: inter-word;
+    line-height: 1.6;
+    font-family: Arial, Helvetica, sans-serif;
     font-size: 18px;
+}
+
+#control-stripe {
+    background-color: lightgray;
+    padding: 15px 0;
+    margin-top: 30px;
 }
 
 #controls {
-    margin-top: 50px;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    margin: auto;
+    width: 80%;
 }
 
 #controls label {
-    font-family: 'Oxygen', sans-serif;
-    font-size: 18px;
+    display: flex;
+    align-items: center;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 14px;
 }
 
 #controls input {
     width: 40px;
     height: 20px;
+}
+
+#controls > div > div {
+    margin-bottom: 5px;
+}
+
+#controls > div > div:last-child {
+    margin-bottom: 0;
+}
+
+#controls > div.text-control > div {
+    display: flex;
+    justify-content: space-between;
+}
+
+#controls > div.text-control > div > input {
+    margin-left: 5px;
+}
+
+#controls > div.radio-control > div {
+    display: flex;
+}
+
+#controls > div.button-control {
+    height: 50px;
+}
+
+#controls > div.button-control > button {
+    height: 100%;
+    width: 100px;
+    border-radius: 0;
+    border-width: 0;
+    color: white;
+    background-color: #8eb2f1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+#controls > div.button-control > button:hover {
+    background-color: cornflowerblue;
+    cursor: pointer;
+}
+
+#controls > div.button-control > button:active {
+    background-color: #154eb7;
 }
 
 #input .gallery {
