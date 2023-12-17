@@ -234,7 +234,7 @@ function getInputGallery() {
 function startNarrowArtGallery() {
     const gallery = getInputGallery();
 
-    const roomsToCloseInput = document.getElementById("roomsToClose");
+    const roomsToCloseInput = document.getElementById("rooms-to-close");
     let roomsToClose = parseInt(roomsToCloseInput.value);
 
     if (isNaN(roomsToClose)) {
@@ -339,8 +339,8 @@ function buildGalleryTable(gallery, galleryParentDiv, id, gallerySolution = null
  * - if it is smaller than the current gallery, remove the extra rooms from the
  *   current gallery.
  */
-function updateInputGallery() {
-    const numberOfColumns = parseInt(document.getElementById("numberOfColumns").value);
+function updateInputGallerySize() {
+    const numberOfColumns = parseInt(document.getElementById("number-of-columns").value);
 
     if (isNaN(numberOfColumns) || numberOfColumns == 0) {
         return;
@@ -375,6 +375,8 @@ function randomizeGalleryRoomValues() {
     buildGalleryTable(newGallery, inputGalleryDiv, "input-gallery");
 }
 
-document.getElementById("startButton").addEventListener("click", startNarrowArtGallery);
-document.getElementById("numberOfColumns").addEventListener("input", updateInputGallery);
-document.getElementById("randomizeButton").addEventListener("click", randomizeGalleryRoomValues);
+document.getElementById("start-button").addEventListener("click", startNarrowArtGallery);
+document.getElementById("number-of-columns").addEventListener("input", updateInputGallerySize);
+document.getElementById("randomize-button").addEventListener("click", randomizeGalleryRoomValues);
+
+window.addEventListener("load", randomizeGalleryRoomValues);
