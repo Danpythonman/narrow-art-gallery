@@ -59,7 +59,7 @@ async function startArtGallery(gallery, roomsToClose, useDynamicProgramming, max
         if (useDynamicProgramming) {
             return solutionDynamic = narrowArtGalleryDynamic(gallery, roomsToClose, maximize);
         } else {
-            return solutionRecursive = narrowArtGalleryRecursive(gallery, gallery[0].length - 1, roomsToClose, "none");
+            return solutionRecursive = narrowArtGalleryRecursive(gallery, gallery[0].length - 1, roomsToClose, "none", maximize);
         }
     }
 }
