@@ -234,7 +234,30 @@ function getInputGallery() {
 function startNarrowArtGallery() {
     const gallery = getInputGallery();
 
-    const roomsToClose = parseInt(document.getElementById("roomsToClose").value);
+    const roomsToCloseInput = document.getElementById("roomsToClose");
+    let roomsToClose = parseInt(roomsToCloseInput.value);
+
+    if (isNaN(roomsToClose)) {
+        roomsToClose = parseInt(prompt("You didn't enter the number of rooms to close! You can enter it here:", ""));
+        if (isNaN(roomsToClose)) {
+            roomsToClose = parseInt(prompt("Okay c'mon. It has to be a number.", ""));
+            if (isNaN(roomsToClose)) {
+                alert("I'm done with you.");
+                return;
+            }
+        }
+        roomsToCloseInput.value = roomsToClose;
+    }
+
+    if (roomsToClose <= 0) {
+        alert("Rooms to close should be more than 0.");
+        return;
+    }
+
+    if (roomsToClose > gallery[0].length) {
+        alert("Rooms to close should be less than the gallery length.");
+        return;
+    }
 
     const solutionRecursive = narrowArtGalleryRecursive(gallery, gallery[0].length - 1, roomsToClose, "none");
     const solutionDynamic = narrowArtGalleryDynamic(gallery, roomsToClose);
