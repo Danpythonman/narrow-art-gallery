@@ -23,9 +23,11 @@ function chooseBestOption(options) {
  * @param {Number[][]} gallery The array representing the art gallery.
  * @param {Number} roomsToClose The number of rooms we have left to close.
  *
- * @returns {{ cost: Number, solution: Boolean[][] }} Solution the problem and its cost. In the solution array, if index (i, j) is true, it means close that room. If it is false, leave it open.
+ * @returns {{ cost: Number, solution: Boolean[][], duration: Number }} Solution the problem, its cost, and its duration in milliseconds. In the solution array, if index (i, j) is true, it means close that room. If it is false, leave it open.
  */
 function narrowArtGalleryDynamic(gallery, roomsToClose) {
+    const startTime = Date.now();
+
     // We add 1 to the length of the gallery so that we can denote column 0 as 0
     // rooms left in the gallery.
     const n = gallery[0].length + 1;
@@ -146,7 +148,9 @@ function narrowArtGalleryDynamic(gallery, roomsToClose) {
         lastClosed = closeRoom;
     }
 
-    return { cost: bestSolutionCost, solution: solution };
+    const endTime = Date.now();
+
+    return { cost: bestSolutionCost, solution: solution, duration: endTime - startTime };
 }
 
 /**
@@ -158,9 +162,11 @@ function narrowArtGalleryDynamic(gallery, roomsToClose) {
  * @param {Number} roomsToClose The number of rooms we have left to close.
  * @param {("top" | "bottom" | "none")} previouslyClosed Which room was previously closed.
  *
- * @returns {{ cost: Number, solution: Boolean[][] }} Solution to the current column and prior.
+ * @returns {{ cost: Number, solution: Boolean[][], duration: Number }} Solution to the current column and prior.
  */
 function narrowArtGalleryRecursive(gallery, column, roomsToClose, previouslyClosed) {
+    const startTime = Date.now();
+
     if (column == -1) {
         if (roomsToClose == 0) {
             return { cost: 0, solution: [Array(gallery[0].length), Array(gallery[1].length)] };
@@ -208,6 +214,10 @@ function narrowArtGalleryRecursive(gallery, column, roomsToClose, previouslyClos
             solution = solution3;
         }
     }
+
+    const endTime = Date.now();
+    solution.duration = endTime - startTime;
+
     return solution;
 }
 
@@ -226,6 +236,14 @@ function getInputGallery() {
                     cell => parseInt(cell.querySelector("input").value)
                 )
         );
+}
+
+function startArtGallery(gallery, roomsToClose, useDynamicProgramming) {
+    if (useDynamicProgramming) {
+        return solutionDynamic = narrowArtGalleryDynamic(gallery, roomsToClose);
+    } else {
+        return solutionRecursive = narrowArtGalleryRecursive(gallery, gallery[0].length - 1, roomsToClose, "none");
+    }
 }
 
 /**
@@ -259,24 +277,23 @@ function startNarrowArtGallery() {
         return;
     }
 
-    const solutionRecursive = narrowArtGalleryRecursive(gallery, gallery[0].length - 1, roomsToClose, "none");
-    const solutionDynamic = narrowArtGalleryDynamic(gallery, roomsToClose);
+    const loadingSpinner = document.getElementById("loading-spinner");
+    loadingSpinner.style.display = "block";
 
-    const recursiveBacktrackingSolutionDiv = document.getElementById("recursive-backtracking-solution");
+    const useDynamicProgramming = document.getElementById("dynamic").checked;
+    const solution = startArtGallery(gallery, roomsToClose, useDynamicProgramming);
+
+    loadingSpinner.style.display = "none";
+
+    const id = "solution-gallery";
+    const solutionDiv = document.getElementById(id);
     buildGalleryTable(
         gallery,
-        recursiveBacktrackingSolutionDiv,
-        "recursive-backtracking-solution-gallery",
-        solutionRecursive.solution
+        solutionDiv,
+        id,
+        solution.solution
     );
-
-    const dynamicProgrammingSolutionDiv = document.getElementById("dynamic-programming-solution");
-    buildGalleryTable(
-        gallery,
-        dynamicProgrammingSolutionDiv,
-        "dynamic-programming-solution-gallery",
-        solutionDynamic.solution
-    );
+    buildGallerySolutionText(solution, useDynamicProgramming);
 }
 
 /**
@@ -327,6 +344,20 @@ function buildGalleryTable(gallery, galleryParentDiv, id, gallerySolution = null
 
     galleryParentDiv.innerHTML = "";
     galleryParentDiv.appendChild(table);
+}
+
+function buildGallerySolutionText(solution, useDynamicProgramming) {
+    const solutionTextDiv = document.getElementById("solution-text");
+    solutionTextDiv.innerHTML = "";
+    const h1 = document.createElement("h1");
+    h1.innerText = "Solution";
+    const explanationText = document.createElement("p");
+    explanationText.innerHTML = `Completed with ${useDynamicProgramming ? "dynamic programming" : "brute force (recursive backtracking)"} in <b>${solution.duration} ms</b>`;
+    const costText = document.createElement("p");
+    costText.innerHTML = `Cost: <b>${solution.cost}</b>`;
+    solutionTextDiv.appendChild(h1);
+    solutionTextDiv.appendChild(explanationText);
+    solutionTextDiv.appendChild(costText);
 }
 
 /**
