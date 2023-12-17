@@ -22,17 +22,18 @@ function getInputGallery() {
  * @param {Number[][]} gallery The array representing the art gallery.
  * @param {Number} roomsToClose The number of rooms we have left to close.
  * @param {Boolean} useDynamicProgramming If true, dynamic programming will be used. Otherwise, recursive backtracking will be used.
+ * @param {Boolean} maximize If true, the solution is maximized. Otherwise, the solution is minimized.
  *
  * @returns {Promise<{ cost: Number, solution: Boolean[][], duration: Number }>} Solution the problem, its cost, and its duration in milliseconds. In the solution array, if index (i, j) is true, it means close that room. If it is false, leave it open.
  */
-function dispatchArtGalleryToWebWorker(gallery, roomsToClose, usedDynamicProgramming) {
+function dispatchArtGalleryToWebWorker(gallery, roomsToClose, usedDynamicProgramming, maximize) {
     return new Promise((resolve) => {
         const algorithmFile = usedDynamicProgramming
             ? "narrowArtGalleryDynamic.js"
             : "narrowArtGalleryRecursive.js";
         const worker = new Worker(algorithmFile);
 
-        worker.postMessage({ type: "narrowArtGallery", gallery: gallery, roomsToClose: roomsToClose });
+        worker.postMessage({ type: "narrowArtGallery", gallery: gallery, roomsToClose: roomsToClose, maximize: maximize });
 
         worker.onmessage = function (event) {
             worker.terminate();
@@ -47,15 +48,16 @@ function dispatchArtGalleryToWebWorker(gallery, roomsToClose, usedDynamicProgram
  * @param {Number[][]} gallery The array representing the art gallery.
  * @param {Number} roomsToClose The number of rooms we have left to close.
  * @param {Boolean} useDynamicProgramming If true, dynamic programming will be used. Otherwise, recursive backtracking will be used.
+ * @param {Boolean} maximize If true, the solution is maximized. Otherwise, the solution is minimized.
  *
  * @returns {Promise<{ cost: Number, solution: Boolean[][], duration: Number }>} Solution the problem, its cost, and its duration in milliseconds. In the solution array, if index (i, j) is true, it means close that room. If it is false, leave it open.
  */
-async function startArtGallery(gallery, roomsToClose, useDynamicProgramming) {
+async function startArtGallery(gallery, roomsToClose, useDynamicProgramming, maximize) {
     if (window.Worker) {
-        return await dispatchArtGalleryToWebWorker(gallery, roomsToClose, useDynamicProgramming);
+        return await dispatchArtGalleryToWebWorker(gallery, roomsToClose, useDynamicProgramming, maximize);
     } else {
         if (useDynamicProgramming) {
-            return solutionDynamic = narrowArtGalleryDynamic(gallery, roomsToClose);
+            return solutionDynamic = narrowArtGalleryDynamic(gallery, roomsToClose, maximize);
         } else {
             return solutionRecursive = narrowArtGalleryRecursive(gallery, gallery[0].length - 1, roomsToClose, "none");
         }
@@ -99,7 +101,9 @@ async function startNarrowArtGallery() {
     showLoadingSpinner();
 
     const useDynamicProgramming = document.getElementById("dynamic").checked;
-    const solution = await startArtGallery(gallery, roomsToClose, useDynamicProgramming);
+    const maximize = document.getElementById("maximize").checked;
+
+    const solution = await startArtGallery(gallery, roomsToClose, useDynamicProgramming, maximize);
 
     hideLoadingSpinner();
 

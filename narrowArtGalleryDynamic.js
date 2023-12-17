@@ -2,25 +2,46 @@
  * Gets the best option and its index.
  *
  * @param {Number[]} options Array of options.
+ * @param {Boolean} maximize If true then the maximum option is selected. Otherwise, the minimum option is selected.
+ *
  * @returns The best option and its index.
  */
-function chooseBestOption(options) {
+function chooseBestOption(options, maximize) {
     if (options.length == 1) {
         throw Error("Array is empty");
     }
     if (options.length == 1) {
         return 0;
     }
-    let max = options[0];
-    let maxIndex = 0;
-    for (let i = 1; i < options.length; i++) {
-        if (options[i] > max) {
-            max = options[i];
-            maxIndex = i;
+
+    let bestCost;
+    let bestOption;
+
+    if (maximize) {
+        let max = options[0];
+        let maxIndex = 0;
+        for (let i = 1; i < options.length; i++) {
+            if (options[i] > max) {
+                max = options[i];
+                maxIndex = i;
+            }
         }
+        bestCost = max;
+        bestOption = maxIndex;
+    } else {
+        let min = options[0];
+        let minIndex = 0;
+        for (let i = 1; i < options.length; i++) {
+            if (options[i] < min) {
+                min = options[i];
+                minIndex = i;
+            }
+        }
+        bestCost = min;
+        bestOption = minIndex;
     }
 
-    return { bestCost: max, bestOption: maxIndex };
+    return { bestCost: bestCost, bestOption: bestOption };
 }
 
 /**
@@ -28,10 +49,11 @@ function chooseBestOption(options) {
  *
  * @param {Number[][]} gallery The array representing the art gallery.
  * @param {Number} roomsToClose The number of rooms we have left to close.
+ * @param {Boolean} maximize If true, the solution is maximized. Otherwise, the solution is minimized.
  *
  * @returns {{ cost: Number, solution: Boolean[][], duration: Number }} Solution the problem, its cost, and its duration in milliseconds. In the solution array, if index (i, j) is true, it means close that room. If it is false, leave it open.
  */
-function narrowArtGalleryDynamic(gallery, roomsToClose) {
+function narrowArtGalleryDynamic(gallery, roomsToClose, maximize = true) {
     const startTime = Date.now();
 
     // We add 1 to the length of the gallery so that we can denote column 0 as 0
@@ -49,7 +71,7 @@ function narrowArtGalleryDynamic(gallery, roomsToClose) {
     const OPTIONS = [NONE, TOP, BOTTOM];
 
     // This is the cost of a solution if it is invalid
-    const INVALID_SOLUTION_COST = -Infinity;
+    const INVALID_SOLUTION_COST = maximize ? -Infinity : Infinity;
 
     // n x r x 3 arrays to store cost and solution
 
@@ -74,7 +96,7 @@ function narrowArtGalleryDynamic(gallery, roomsToClose) {
 
     // If we reach the end of the hall and still have rooms left to close, then
     // the solution is invalid.
-    for (let i = 1; i < roomsToClose; i++) {
+    for (let i = 1; i < roomsToClose+1; i++) {
         cost[0][i][NONE] = INVALID_SOLUTION_COST;
         cost[0][i][TOP] = INVALID_SOLUTION_COST;
         cost[0][i][BOTTOM] = INVALID_SOLUTION_COST;
@@ -113,7 +135,7 @@ function narrowArtGalleryDynamic(gallery, roomsToClose) {
                     options[BOTTOM]= cost[column-1][r-1][BOTTOM] + gallery[1][column-1];
                 }
 
-                const { bestOption, bestCost } = chooseBestOption(options);
+                const { bestOption, bestCost } = chooseBestOption(options, maximize);
 
                 // Advice tells us what door (if any) to close in this column
                 advice[column][r][close] = bestOption;
@@ -135,7 +157,7 @@ function narrowArtGalleryDynamic(gallery, roomsToClose) {
     const {
         bestOption: start,
         bestCost: bestSolutionCost
-    } = chooseBestOption(cost[n-1][roomsToClose-1]);
+    } = chooseBestOption(cost[n-1][roomsToClose-1], maximize);
 
     let r = roomsToClose;
     let lastClosed = start;
@@ -163,7 +185,8 @@ onmessage = function (event) {
     if (event.data && event.data.type && event.data.type == "narrowArtGallery") {
         const solution = narrowArtGalleryDynamic(
             event.data.gallery,
-            event.data.roomsToClose
+            event.data.roomsToClose,
+            event.data.maximize
         );
         this.postMessage(solution);
     }
