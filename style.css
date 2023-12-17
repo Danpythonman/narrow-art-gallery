@@ -62,14 +62,15 @@ p {
     -moz-appearance: textfield;
 }
 
-#loading-spinner {
-    border: 16px solid lightgray;
+#loading-spinner > div {
+    margin: 10px auto 10px auto;
+    border: 14px solid lightgray;
     border-radius: 50%;
-    border-top: 16px solid cornflowerblue;
-    width: 120px;
-    height: 120px;
-    -webkit-animation: spin 1.5s linear infinite; /* Safari */
-    animation: spin 1.5s linear infinite;
+    border-top: 14px solid cornflowerblue;
+    width: 50px;
+    height: 50px;
+    -webkit-animation: spin 1s linear infinite; /* Safari */
+    animation: spin 1s linear infinite;
 }
 
 @-webkit-keyframes spin {
