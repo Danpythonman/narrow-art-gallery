@@ -157,7 +157,7 @@ function narrowArtGalleryDynamic(gallery, roomsToClose, maximize = true) {
     const {
         bestOption: start,
         bestCost: bestSolutionCost
-    } = chooseBestOption(cost[n-1][roomsToClose-1], maximize);
+    } = chooseBestOption(cost[n-1][roomsToClose], maximize);
 
     let r = roomsToClose;
     let lastClosed = start;
