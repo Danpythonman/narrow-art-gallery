@@ -41,11 +41,15 @@ p {
     background-color: lightpink;
 }
 
+.input.gallery td:hover {
+    background-color: #8eb2f1;
+}
+
 .input.gallery input {
     height: 40px;
     width: 40px;
     margin: 0;
-    background-color: lightgray;
+    background-color: inherit;
     border: none;
     text-align: center;
     font-size: 16px;
