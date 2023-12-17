@@ -240,6 +240,9 @@ function updateInputGallerySize() {
         return;
     }
 
+    clearSolutionGallery();
+    clearSolutionText();
+
     const gallery = getInputGallery();
 
     const newGallery = [Array(numberOfColumns), Array(numberOfColumns)];
@@ -263,6 +266,9 @@ function updateInputGallerySize() {
  * gallery will be a random integer from 0 to 10 (inclusive).
  */
 function randomizeGalleryRoomValues() {
+    clearSolutionGallery();
+    clearSolutionText();
+
     const gallery = getInputGallery();
     const newGallery = gallery.map(row => row.map(() => Math.floor(Math.random() * 10)));
     const inputGalleryDiv = document.getElementById("input");
